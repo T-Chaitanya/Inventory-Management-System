@@ -1,0 +1,6 @@
+ErrorDocument 400 /myDB/error.html
+ErrorDocument 401 /myDB/error.html
+ErrorDocument 403 /myDB/error.html
+ErrorDocument 404 /myDB/error.html
+ErrorDocument 500 /myDB/error.html
+

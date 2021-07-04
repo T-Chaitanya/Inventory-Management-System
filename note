@@ -1,0 +1,16 @@
+BEGIN
+ IF NEW.log != ""
+  THEN
+insert into log_main (`name`,`log`) VALUES (NEW.name, NEW.log);
+END IF;
+
+END
+
+
+BEGIN
+ IF NEW.log != ""
+  THEN
+insert into log_main (`name`,`log`) VALUES (NEW.kname, NEW.log);
+END IF;
+
+END

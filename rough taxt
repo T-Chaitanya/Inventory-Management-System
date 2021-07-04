@@ -1,0 +1,461 @@
+
+<?php if(isset($_POST['error'])){
+    if ($_POST['error']=="kit") {
+        echo '<script>$(".nav li:eq(1) a").tab("show")</script>';
+        echo '<script>Swal.fire({
+            title: "Kit is already Out",
+            text: "You can not edit kits already Out",
+            icon: "error"
+        });</script>';
+    }
+    echo "<h1>fs</h1>";
+   
+    
+}
+if(isset($_POST['tab'])){
+if ($_GET['tab']==1) {
+    echo '<script>$(".nav li:eq(1) a").tab("show")</script>';
+}}
+?>
+
+
+
+<script language="JavaScript">
+$('#cap').click(function() {
+    Webcam.set({
+        width: 426,
+        height: 240,
+        dest_width: 426,
+        dest_height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 100,
+        force_flash: false
+    });
+    Webcam.attach('#my_camera');
+    $('#kimg').modal('show');
+});
+
+
+function take_snapshot() {
+    Webcam.snap(function(data_uri) {
+        $(".image-tag").val(data_uri);
+        document.getElementById('results').innerHTML = '<img src="' + data_uri + '"/>';
+
+    });
+}
+var pri = 0;
+
+function printk() {
+
+    $("tr").each(function() {
+        $(this).children("td:eq(4)").remove();
+        $(this).children("th:eq(4)").remove();
+        $(this).children("td:eq(4)").remove();
+        $(this).children("th:eq(4)").remove();
+
+
+    });
+
+    var htm = $("#modal-bodyki").html();
+
+    var tit = $("#model_titleki").html();
+    var newWin = window.open('', 'Print-Window');
+    var tbp =
+        '<html><head><link href="assets/css/material-kit.css" type="text/css" rel="stylesheet" /><style>.table td {padding: inherit;}.btn{visibility: hidden !important;}.pimg {width: 120px !important;}td {vertical-align: middle !important;}tr {vertical-align: middle !important;}</style></head><body onload="window.print()"><img id="tempimg" src="logo3.png" alt=""><center><h2>' +
+        tit + '</h2></center><br>' + htm + '</body></html>';
+
+    newWin.document.open();
+
+    newWin.document.write(tbp + '<h3>Price : ' + pri + '</h3>');
+
+    newWin.document.close();
+
+    setTimeout(function() {
+        newWin.close();
+        location.reload();
+    }, 10)
+
+};
+$('#kimgb').click(function() {
+    var imgt = $(".image-tag").val();
+    $('#tempimg').attr('src', imgt);
+    $('#kimg').modal('hide');
+});
+</script>
+<script>
+$('#pimg').on('DOMSubtreeModified', '#imgp', function() {
+    var dv = document.getElementById("imgp");
+    var im = dv.getElementsByTagName("img");
+    $(im).width(200);
+    var image = $(im).attr('src');
+    $(".image-tag").val(image);
+
+});
+
+
+
+function sen(id) {
+    var q = 0
+    Swal.fire({
+        title: 'No. of kits',
+        input: 'text',
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Check',
+        showLoaderOnConfirm: true,
+        preConfirm: (login) => {
+            q = login;
+            return fetch(`requestkits.php?kid=${id}&quan=${login}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return response.json()
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(
+                        `Request failed: ${error}`
+                    )
+                })
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.value.ok) {
+            Swal.fire({
+                title: 'Are you sure to send kits?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        url: "sendkitsout.php",
+                        type: "GET",
+                        data: {
+                            id: id,
+                            quan: q
+
+                        },
+                        cache: false,
+                        success: function(dataResult) {
+                            Swal.fire({
+                                title: 'Done!',
+                                text: 'Kits has been sent.',
+                                icon: 'success'
+                            }).then((result) => {
+                                if (result.value) {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+
+
+
+                }
+            });
+
+
+
+        } else {
+            Swal.fire({
+                title: `${result.value.resp}`,
+                icon: 'error'
+            });
+        }
+    });
+};
+
+function efr(id) {
+
+    $.getJSON('infok.php', {
+        id: id
+    }, function(data, textStatus, jqXHR) {
+        $('#kname').val(data.kname);
+        $('#quank').val(data.quan);
+        $('#quanc').val(data.com);
+        $('#price').val(data.pri);
+        $("#quanc").blur();
+    });
+
+};
+
+function addback(id) {
+    var q = 0
+    Swal.fire({
+        title: 'No. of kits to add back',
+        input: 'text',
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Check',
+        showLoaderOnConfirm: true,
+        preConfirm: (login) => {
+            q = login;
+            return fetch(`requestkitsout.php?kid=${id}&quan=${login}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return response.json()
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(
+                        `Request failed: ${error}`
+                    )
+                })
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.value.ok) {
+            Swal.fire({
+                title: 'Are you sure to add back kits?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        url: "sendkitsin.php",
+                        type: "GET",
+                        data: {
+                            id: id,
+                            quan: q
+                        },
+                        cache: false,
+                        success: function(dataResult) {
+                            Swal.fire({
+                                title: 'Done!',
+                                text: 'Kits has been added in.',
+                                icon: 'success'
+                            }).then((result) => {
+                                if (result.value) {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+
+
+
+                }
+            });
+
+
+
+        } else {
+            Swal.fire({
+                title: `${result.value.resp}`,
+                icon: 'error'
+            });
+        }
+    });
+}
+
+function delkit(id) {
+
+
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: "deletekitout.php",
+                type: "GET",
+                data: {
+                    id: id
+                },
+                cache: false,
+                success: function(dataResult) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Kit has been deleted.',
+                        icon: 'success'
+                    }).then((result) => {
+                        if (result.value) {
+                            location.reload();
+                        }
+                    });
+
+
+
+                }
+            });
+
+        }
+    });
+
+}
+
+function mfr(id) {
+
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: "deletekit.php",
+                type: "GET",
+                data: {
+                    id: id
+                },
+                cache: false,
+                success: function(dataResult) {
+                    Swal.fire(
+                        'Deleted!',
+                        'Kit has been deleted.',
+                        'success'
+                    ).then((result) => {
+                        if (result.value) {
+                            location.reload();
+                        }
+                    });
+
+
+
+                }
+            });
+
+        }
+    });
+
+
+};
+$(document).ready(function() {
+    $("#target-content").load("pagination.php");
+    $(".page-link").click(function() {
+        var id = $(this).attr("data-id");
+        var select_id = $(this).parent().attr("id");
+        $.ajax({
+            url: "pagination.php",
+            type: "GET",
+            data: {
+                page: id
+            },
+            cache: false,
+            success: function(dataResult) {
+                $("#target-content").html(dataResult);
+                $(".page-item").removeClass("active");
+                $("#" + select_id).addClass("active");
+
+            }
+        });
+    });
+    var quan = 0;
+    $("#editf").click(function() {
+        if ($("#editf").prop("checked") == false) {
+            $("#add").html('<i class="material-icons">add</i>&nbsp;Add');
+            $("#remove").html('<i class="material-icons">remove</i>&nbsp;Remove');
+            $('#quan').val(null);
+        } else {
+            $("#add").html('<i class="material-icons">edit</i>&nbsp;Edit')
+            $("#remove").html('<i class="material-icons">delete_forever</i>&nbsp;Delete')
+            $('#quan').val(quan);
+        }
+
+    });
+    $("#auto").blur(function() {
+        var cname = $(this).val();
+        if ($("#editf").prop("checked") == false) {
+            $.getJSON('info.php', {
+                name: cname
+            }, function(data, textStatus, jqXHR) {
+                $('#pid').val(data.pid);
+                $('#pidh').val(data.pid);
+                $('#pri').val(data.pri);
+                $('#com').val(data.com);
+                $('#avail').html("Available: " + data.quan);
+                quan = data.quan;
+                $('#tid').val(data.tray);
+                if (data.im == "") {
+                    $('#tempimg').attr('hidden', 'true')
+                } else {
+                    $('#tempimg').removeAttr('hidden');
+                    $('#tempimg').attr('src', data.im);
+                }
+                $('#tempimg').width(200);
+            });
+
+        }
+
+
+
+    });
+    $("#quanc").on('blur', function() {
+        var no = $(this).val();
+        $.ajax({
+            url: "getform.php",
+            type: "GET",
+            data: {
+                no: no
+            },
+            cache: false,
+            success: function(dataResult) {
+                $("#df").html(dataResult);
+
+            }
+        });
+    });
+
+
+    $("#kits tr").each(function(r) {
+        var row = r;
+        $("td", this).each(function(d) {
+            var cell = d;
+            $(this)
+                .data("rowIndex", row)
+                .data("cellIndex", cell)
+                .data("kit", $("#kits tr")[row].cells[0].innerHTML)
+                .data("name", $("#kits tr")[row].cells[1].innerHTML)
+                .data("pri", $("#kits tr")[row].cells[3].innerHTML)
+                .click(function() {
+                    pri = $(this).data("pri");
+                    var name = $(this).data("name");
+                    if (cell < 4) {
+                        $.ajax({
+                            url: "getkit.php",
+                            type: "GET",
+                            data: {
+                                id: $(this).data("kit")
+                            },
+                            cache: false,
+                            success: function(dataResult) {
+                                $('#ki').modal('show');
+                                $('#model_titleki').html("<b>" + name +
+                                    "</b>");
+                                $("#modal-bodyki").html(dataResult);
+
+                            }
+                        });
+                    }
+
+                })
+
+        });
+    });
+
+
+
+});
+</script>
